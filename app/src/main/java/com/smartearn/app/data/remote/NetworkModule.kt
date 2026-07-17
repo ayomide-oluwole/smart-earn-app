@@ -7,8 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object NetworkModule {
-    // CHANGE THIS TO YOUR NGROK URL AFTER SETTING UP THE SERVER
-    private const val BASE_URL = "https://your-ngrok-url.ngrok.io/"
+    private const val BASE_URL = "https://smart-earn-server.onrender.com/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
