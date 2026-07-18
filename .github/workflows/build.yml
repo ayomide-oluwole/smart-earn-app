@@ -16,66 +16,61 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Clean up bad resource files
+      - name: COMPLETELY wipe and recreate all resource files
         run: |
-          rm -rf app/src/main/res/mipmap_hdpi || true
-          rm -rf app/src/main/res/mipmap-hdpi || true
-          rm -rf app/src/main/res/mipmap-mdpi || true
-          rm -rf app/src/main/res/mipmap-xhdpi || true
-          rm -rf app/src/main/res/mipmap-xxhdpi || true
-          rm -rf app/src/main/res/mipmap-xxxhdpi || true
-
-      - name: Create proper launcher icons
-        run: |
+          # Delete ALL old launcher resources
+          rm -rf app/src/main/res/mipmap-*
+          rm -f app/src/main/res/drawable/ic_launcher_*
+          rm -f app/src/main/res/values/colors.xml
+          
+          # Create clean structure
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/mipmap-anydpi-v26
+          mkdir -p app/src/main/res/values
           
-          # Foreground icon
-          cat > app/src/main/res/drawable/ic_launcher_foreground.xml << 'EOF'
+          # Colors
+          cat > app/src/main/res/values/colors.xml << 'ENDCOLOR'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="ic_launcher_background">#4CAF50</color>
+          </resources>
+          ENDCOLOR
+          
+          # Foreground drawable (XML only - NO PNG)
+          cat > app/src/main/res/drawable/ic_launcher_foreground.xml << 'ENDVEC'
           <?xml version="1.0" encoding="utf-8"?>
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
               android:width="108dp"
               android:height="108dp"
               android:viewportWidth="108"
               android:viewportHeight="108">
-            <path
-                android:fillColor="#4CAF50"
-                android:pathData="M54,54m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0"/>
-            <path
-                android:fillColor="#FFFFFF"
-                android:pathData="M36,54l12,-12l12,12"/>
+              <path
+                  android:fillColor="#FFFFFF"
+                  android:pathData="M54,54m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0"/>
+              <path
+                  android:fillColor="#4CAF50"
+                  android:pathData="M36,54l12,-12l12,12l-12,12z"/>
           </vector>
-          EOF
+          ENDVEC
           
-          # Adaptive icon - correct format for mipmap-anydpi-v26
-          cat > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml << 'EOF'
+          # Adaptive icon
+          cat > app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml << 'ENDADAPT'
           <?xml version="1.0" encoding="utf-8"?>
           <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
               <background android:drawable="@color/ic_launcher_background"/>
               <foreground android:drawable="@drawable/ic_launcher_foreground"/>
           </adaptive-icon>
-          EOF
+          ENDADAPT
           
-          cat > app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml << 'EOF'
+          cat > app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml << 'ENDADAPT2'
           <?xml version="1.0" encoding="utf-8"?>
           <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
               <background android:drawable="@color/ic_launcher_background"/>
               <foreground android:drawable="@drawable/ic_launcher_foreground"/>
           </adaptive-icon>
-          EOF
+          ENDADAPT2
           
-          # Color resource
-          cat > app/src/main/res/values/colors.xml << 'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <resources>
-              <color name="ic_launcher_background">#4CAF50</color>
-          </resources>
-          EOF
-          
-          # Fallback PNG icons (required for pre-v26 devices)
-          # Create a tiny 48x48 PNG placeholder using base64
-          echo "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjEuMWFkghEAAAGJSURBVGhD7Zc9TsNAEIX3HIGKCyCh9BQcgY4LUNDRcAAKbkBHgQJxADoqCg5ASUfDAdIlO0L+Rutk1mt7k53YgZkfaSSv7dmZb2ftOEmSJEmSJEmSJEmSJEmSJEmSJEmS9A/0BfQB9AH0AfQB9AH0AUJ8+QB9gD5AFz6yBfQBfAB9AB9AH8AH0AfwAfQBfAB9AB9AH8AH0AfwAfQBfAB9gD4AfQB9gD6AD6AP4APoA/gA+gA+gD6AD6AP4APoA/gA+gA+gD6Avw==" | base64 -d > app/src/main/res/drawable/ic_launcher_foreground.png
-          echo "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjEuMWFkghEAAAGJSURBVGhD7Zc9TsNAEIX3HIGKCyCh9BQcgY4LUNDRcAAKbkBHgQJxADoqCg5ASUfDAdIlO0L+Rutk1mt7k53YgZkfaSSv7dmZb2ftOEmSJEmSJEmSJEmSJEmSJEmSJElS/0BfQB9AH0AfQB9AH0AfIMT3PkAfQB9AFz6yBfQBfAB9AB9AH8AH0AfwAfQBfAB9AB9AH8AH0AfwAfQBfAB9gD4AfQB9gD6AD6AP4APoA/gA+gA+gD6AD6AP4APoA/gA+gA+gD6Avw==" | base64 -d > app/src/main/res/drawable/ic_launcher_background.png
+          echo "✅ Resources reset complete - no PNG files exist"
 
       - name: Generate gradlew
         run: |
