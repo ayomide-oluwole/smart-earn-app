@@ -1,5 +1,8 @@
 package com.smartearn.app.ui.screens
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -39,12 +42,11 @@ fun LoginScreen(
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // Check network connectivity first
     fun hasNetwork(): Boolean {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = cm.activeNetwork ?: return false
         val caps = cm.getNetworkCapabilities(network) ?: return false
-        return caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
     Column(
@@ -137,7 +139,6 @@ fun LoginScreen(
                         if (user != null) {
                             db.userDao().setLoggedIn(email, true)
 
-                            // Notify server of login
                             try {
                                 NetworkModule.apiService.login(
                                     LoginRequest(
@@ -152,7 +153,6 @@ fun LoginScreen(
                             isLoading = false
                             onLoginSuccess()
                         } else {
-                            // Check if user exists at all
                             val existingUser = db.userDao().getUserByEmail(email)
                             if (existingUser == null) {
                                 errorMessage = "No account found with this email. Please sign up first."
